@@ -25,3 +25,26 @@ export const getCoins = async (page = 1, perPage = 20) => {
     return mockCoins;
   }
 };
+
+export const fetchCoinDetails = async (id) => {
+  const response = await axios.get(`${BASE_URL}/coins/${id}`, {
+    params: {
+      localization: false,
+      tickers: false,
+      market_data: true,
+      community_data: false,
+      developer_data: false,
+    },
+  });
+  return response.data;
+};
+
+export const fetchCoinHistory = async (id, days) => {
+  const response = await axios.get(`${BASE_URL}/coins/${id}/market_chart`, {
+    params: {
+      vs_currency: "usd",
+      days: days,
+    },
+  });
+  return response.data.prices;
+};

@@ -588,3 +588,31 @@ export const mockCoins = [
     last_updated: "2024-11-22T00:50:18.213Z",
   },
 ];
+
+export const mockCoinDetails = {
+  id: "bitcoin",
+  symbol: "btc",
+  name: "Bitcoin",
+  description: {
+    en: "Bitcoin is the first decentralized cryptocurrency...",
+  },
+  image: {
+    large: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
+  },
+  market_cap_rank: 1,
+  market_data: {
+    current_price: {
+      usd: 50000,
+    },
+    total_volume: {
+      usd: 30000000000,
+    },
+  },
+};
+
+export const mockPriceHistory = Array.from({ length: 30 }, (_, i) => ({
+  timestamp: new Date(
+    Date.now() - i * 24 * 60 * 60 * 1000
+  ).toLocaleDateString(),
+  price: 45000 + Math.random() * 10000,
+}));
