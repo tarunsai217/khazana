@@ -1,33 +1,13 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { Moon, Sun } from "lucide-react";
-import { getCoins } from "./api/apis";
 import CoinList from "./Pages/CoinList";
 function App() {
   const [darkMode, setDarkMode] = useState(false);
-  const [coins, setCoins] = useState([]);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  useEffect(() => {
-    fetchCoins();
-  }, [page]);
-
-  async function fetchCoins() {
-    setLoading(true);
-    try {
-      const data = await getCoins(page);
-      setCoins(data);
-    } catch (error) {
-      console.error("Error fetching coins:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
   return (
     <>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">

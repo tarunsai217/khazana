@@ -1,9 +1,87 @@
-import React from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowDown, ArrowUp, Search, ArrowUpDown } from "lucide-react";
+import { getCoins } from "../api/apis";
 
-function CoinList({ coins }) {
+function CoinList() {
+  const [coins, setCoins] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "desc",
+  });
+
+  useEffect(() => {
+    fetchCoins();
+  }, [page]);
+
+  async function fetchCoins() {
+    setLoading(true);
+    try {
+      const data = await getCoins(page);
+      setCoins(data);
+    } catch (error) {
+      console.error("Error fetching coins:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const getSortIcon = (key) => {
+    if (sortConfig?.key !== key)
+      return <ArrowUpDown size={16} className="ml-1 text-gray-400" />;
+    return sortConfig.direction === "asc" ? (
+      <ArrowUp size={16} className="ml-1 text-blue-500" />
+    ) : (
+      <ArrowDown size={16} className="ml-1 text-blue-500" />
+    );
+  };
+
+  const handleSort = (key) => {
+    setSortConfig((prevConfig) => ({
+      key,
+      direction:
+        prevConfig.key === key && prevConfig.direction === "desc"
+          ? "asc"
+          : "desc",
+    }));
+  };
+
+  //sort & filter
+  const sortedCoins = [...coins].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+
+    const aValue = a[sortConfig.key];
+    const bValue = b[sortConfig.key];
+
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+    }
+    return 0;
+  });
+  const filteredCoins = sortedCoins.filter(
+    (coin) =>
+      coin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      coin.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   return (
     <div className="w-full">
+      <div className="mb-6">
+        <div className="relative">
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
+            size={20}
+          />
+          <input
+            type="text"
+            placeholder="Search cryptocurrencies..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
           <thead className="bg-gray-50 dark:bg-gray-700">
@@ -11,23 +89,34 @@ function CoinList({ coins }) {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Coin
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer">
-                <span className="flex items-center justify-end">Price</span>
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer">
+              <th
+                onClick={() => handleSort("current_price")}
+                className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+              >
                 <span className="flex items-center justify-end">
-                  24h Change
+                  Price {getSortIcon("current_price")}{" "}
                 </span>
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer">
+              <th
+                onClick={() => handleSort("price_change_percentage_24h")}
+                className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+              >
                 <span className="flex items-center justify-end">
-                  Market Cap
+                  24h Change {getSortIcon("price_change_percentage_24h")}
+                </span>
+              </th>
+              <th
+                onClick={() => handleSort("market_cap")}
+                className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+              >
+                <span className="flex items-center justify-end">
+                  Market Cap {getSortIcon("market_cap")}
                 </span>
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {coins.map((coin) => (
+            {filteredCoins?.map((coin) => (
               <tr
                 key={coin.id}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
