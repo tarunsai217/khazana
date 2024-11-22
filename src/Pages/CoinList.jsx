@@ -132,7 +132,6 @@ function CoinList() {
               <tr
                 key={coin.id}
                 onClick={() => {
-                  console.log("coin.id", coin.id);
                   handleNavigateToCoinDetails(coin.id);
                 }}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
