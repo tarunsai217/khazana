@@ -95,39 +95,39 @@ function CoinList() {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-          <thead className="bg-gray-50 dark:bg-gray-700">
+        <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden  divide-y divide-gray-200  ">
+          <thead className="bg-gray-50 dark:bg-gray-700 ">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Coin
+              <th className="px-6 py-3 text-left  text-xs font-[700] text-gray-500 dark:text-gray-500 uppercase tracking-wider">
+                <span className="ml-[10px]"> Coin</span>
               </th>
               <th
                 onClick={() => handleSort("current_price")}
-                className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                className="px-6 py-3 text-right text-xs font-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
               >
-                <span className="flex items-center justify-end">
+                <span className="flex items-center justify-center">
                   Price {getSortIcon("current_price")}{" "}
                 </span>
               </th>
               <th
                 onClick={() => handleSort("price_change_percentage_24h")}
-                className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                className="px-6 py-3 text-right text-xs ffont-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
               >
-                <span className="flex items-center justify-end">
+                <span className="flex items-center justify-center">
                   24h Change {getSortIcon("price_change_percentage_24h")}
                 </span>
               </th>
               <th
                 onClick={() => handleSort("market_cap")}
-                className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                className="px-6 py-3 text-right text-xs font-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
               >
-                <span className="flex items-center justify-end">
+                <span className="flex items-center justify-center">
                   Market Cap {getSortIcon("market_cap")}
                 </span>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-left">
             {filteredCoins?.map((coin) => (
               <tr
                 key={coin.id}
@@ -144,7 +144,7 @@ function CoinList() {
                       className="w-8 h-8 rounded-full"
                     />
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      <div className="text-[1rem] font-[600] text-gray-900 dark:text-white">
                         {coin.name}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -153,10 +153,10 @@ function CoinList() {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
+                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
                   ${coin.current_price.toLocaleString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                   <span
                     className={`inline-flex items-center ${
                       coin.price_change_percentage_24h > 0
@@ -172,7 +172,7 @@ function CoinList() {
                     {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
+                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
                   ${coin.market_cap.toLocaleString()}
                 </td>
               </tr>
