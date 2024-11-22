@@ -13,6 +13,7 @@ import { RefreshCw } from "lucide-react";
 import { fetchCoinDetails, fetchCoinHistory } from "../api/apis";
 import { mockCoinDetails, mockPriceHistory } from "../api/mockData";
 import SkeletonLoader from "../Components/CoinDetailsSkeleton.jsx";
+import ChartSkeletonLoader from "../Components/ChartSkeleton";
 const timeframes = [
   { label: "24h", value: 1 },
   { label: "7d", value: 7 },
@@ -28,15 +29,27 @@ const CoinDetail = () => {
   const [timeframe, setTimeframe] = useState(timeframes[0]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [chartLoading, setChartLoading] = useState(false); // Add local loading state for the chart
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [details, history] = await Promise.all([
-        fetchCoinDetails(id),
-        fetchCoinHistory(id, timeframe.value),
-      ]);
+      const [details] = await Promise.all([fetchCoinDetails(id)]);
       setCoinData(details);
+      setError("");
+    } catch (err) {
+      console.error("Failed to fetch coin data:", err);
+      setError("Failed to load data. Using mock data instead.");
+      setCoinData(mockCoinDetails);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadChartData = async () => {
+    try {
+      setChartLoading(true);
+      const history = await fetchCoinHistory(id, timeframe.value);
       setPriceHistory(
         history.map((point) => ({
           timestamp: new Date(point[0]).toLocaleDateString(),
@@ -45,20 +58,23 @@ const CoinDetail = () => {
       );
       setError("");
     } catch (err) {
-      console.error("Failed to fetch coin data:", err);
+      console.error("Failed to fetch price history:", err);
       setError("Failed to load data. Using mock data instead.");
-      setCoinData(mockCoinDetails);
       setPriceHistory(mockPriceHistory);
     } finally {
       setTimeout(() => {
-        setLoading(false);
+        setChartLoading(false);
       }, 200);
     }
   };
 
   useEffect(() => {
     loadData();
-  }, [id, timeframe]);
+  }, [id]);
+
+  useEffect(() => {
+    loadChartData();
+  }, [timeframe]);
 
   if (loading) {
     return <SkeletonLoader />;
@@ -146,31 +162,38 @@ const CoinDetail = () => {
           </div>
 
           <div className="h-[400px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={priceHistory}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="timestamp"
-                  tick={{ fontSize: 12 }}
-                  interval="preserveStartEnd"
-                />
-                <YAxis
-                  domain={["auto", "auto"]}
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => `$${value.toLocaleString()}`}
-                />
-                <Tooltip
-                  formatter={(value) => [`$${value.toLocaleString()}`, "Price"]}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="price"
-                  stroke="#2563eb"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {chartLoading ? (
+              <ChartSkeletonLoader />
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={priceHistory}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="timestamp"
+                    tick={{ fontSize: 12 }}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis
+                    domain={["auto", "auto"]}
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => `$${value.toLocaleString()}`}
+                  />
+                  <Tooltip
+                    formatter={(value) => [
+                      `$${value.toLocaleString()}`,
+                      "Price",
+                    ]}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="price"
+                    stroke="#2563eb"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
@@ -179,7 +202,7 @@ const CoinDetail = () => {
             About {coinData.name}
           </h2>
           <div
-            className="prose max-w-none dark:prose-dar text-gray-900 dark:text-white"
+            className="prose max-w-none dark:prose-dark text-gray-900 dark:text-white"
             dangerouslySetInnerHTML={{ __html: coinData.description.en }}
           />
         </div>
