@@ -155,8 +155,8 @@ const CoinDetail = () => {
         </div>
 
         <div className="mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 md:mb-0 text-left">
               Price History
             </h2>
             <div className="flex space-x-2">
