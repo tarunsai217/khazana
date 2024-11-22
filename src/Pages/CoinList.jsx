@@ -3,6 +3,8 @@ import { ArrowDown, ArrowUp, Search, ArrowUpDown } from "lucide-react";
 import { getCoins } from "../api/apis";
 import Pagination from "../Components/Pagination";
 import Skeleton from "../Components/Skeleton";
+import { useNavigate } from "react-router-dom";
+
 function CoinList() {
   const [coins, setCoins] = useState([]);
   const [page, setPage] = useState(1);
@@ -12,6 +14,7 @@ function CoinList() {
     key: null,
     direction: "desc",
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCoins();
@@ -51,6 +54,9 @@ function CoinList() {
     }));
   };
 
+  const handleNavigateToCoinDetails = (id) => {
+    navigate(`/${id}`);
+  };
   //sort & filter
   const sortedCoins = [...coins].sort((a, b) => {
     if (!sortConfig.key) return 0;
@@ -125,6 +131,10 @@ function CoinList() {
             {filteredCoins?.map((coin) => (
               <tr
                 key={coin.id}
+                onClick={() => {
+                  console.log("coin.id", coin.id);
+                  handleNavigateToCoinDetails(coin.id);
+                }}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
               >
                 <td className="px-6 py-4 whitespace-nowrap">

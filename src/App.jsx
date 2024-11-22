@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { Moon, Sun } from "lucide-react";
+import { Routes, Route } from "react-router-dom";
 import CoinList from "./Pages/CoinList";
+import CoinDetails from "./Pages/CoinDetails";
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   useEffect(() => {
@@ -30,7 +32,10 @@ function App() {
               )}
             </button>
           </div>
-          <CoinList />
+          <Routes>
+            <Route path="/" element={<CoinList />} />
+            <Route path="/:id" element={<CoinDetails />} />
+          </Routes>
         </div>
       </div>
     </>
