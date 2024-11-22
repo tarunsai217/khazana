@@ -9,11 +9,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ArrowLeft } from "lucide-react";
 import { fetchCoinDetails, fetchCoinHistory } from "../api/apis";
 import { mockCoinDetails, mockPriceHistory } from "../api/mockData";
 import SkeletonLoader from "../Components/CoinDetailsSkeleton.jsx";
 import ChartSkeletonLoader from "../Components/ChartSkeleton";
+import { useNavigate } from "react-router-dom";
+
 const timeframes = [
   { label: "24h", value: 1 },
   { label: "7d", value: 7 },
@@ -30,6 +32,7 @@ const CoinDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [chartLoading, setChartLoading] = useState(false); // Add local loading state for the chart
+  const navigate = useNavigate();
 
   const loadData = async () => {
     try {
@@ -82,9 +85,21 @@ const CoinDetail = () => {
 
   if (!coinData) return null;
 
+  function goBackHandler() {
+    navigate("/");
+  }
   return (
     <div className="space-y-8">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <>
+          <button
+            onClick={goBackHandler}
+            className="mb-6 flex items-center text-blue-500 bg-transparent py-2 focus:outline-none "
+          >
+            <ArrowLeft size={20} className="mr-2" />
+            Back
+          </button>
+        </>
         <div className="flex justify-between items-start">
           <div className="flex items-center space-x-4">
             <img
