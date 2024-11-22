@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ArrowDown, ArrowUp, Search, ArrowUpDown } from "lucide-react";
 import { getCoins } from "../api/apis";
 import Pagination from "../Components/Pagination";
+import Skeleton from "../Components/Skeleton";
 function CoinList() {
   const [coins, setCoins] = useState([]);
   const [page, setPage] = useState(1);
@@ -24,7 +25,9 @@ function CoinList() {
     } catch (error) {
       console.error("Error fetching coins:", error);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
     }
   }
 
@@ -65,6 +68,9 @@ function CoinList() {
       coin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       coin.symbol.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) return <Skeleton />;
+
   return (
     <div className="w-full">
       <div className="mb-6">
