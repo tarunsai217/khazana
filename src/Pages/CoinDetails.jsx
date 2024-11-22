@@ -9,10 +9,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Loader, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { fetchCoinDetails, fetchCoinHistory } from "../api/apis";
 import { mockCoinDetails, mockPriceHistory } from "../api/mockData";
-
+import SkeletonLoader from "../Components/CoinDetailsSkeleton.jsx";
 const timeframes = [
   { label: "24h", value: 1 },
   { label: "7d", value: 7 },
@@ -50,7 +50,9 @@ const CoinDetail = () => {
       setCoinData(mockCoinDetails);
       setPriceHistory(mockPriceHistory);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 200);
     }
   };
 
@@ -59,11 +61,7 @@ const CoinDetail = () => {
   }, [id, timeframe]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader className="w-8 h-8 animate-spin text-blue-600" />
-      </div>
-    );
+    return <SkeletonLoader />;
   }
 
   if (!coinData) return null;
