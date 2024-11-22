@@ -30,7 +30,7 @@ function App() {
               )}
             </button>
           </div>
-          <CoinList coins={coins} loading={loading} />
+          <CoinList />
         </div>
       </div>
     </>
