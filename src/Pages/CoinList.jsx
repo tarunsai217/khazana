@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowDown, ArrowUp, Search, ArrowUpDown } from "lucide-react";
 import { getCoins } from "../api/apis";
-
+import Pagination from "../Components/Pagination";
 function CoinList() {
   const [coins, setCoins] = useState([]);
   const [page, setPage] = useState(1);
@@ -164,6 +164,7 @@ function CoinList() {
             ))}
           </tbody>
         </table>
+        <Pagination page={page} setPage={setPage} totalPages={10} />
       </div>
     </div>
   );
