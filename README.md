@@ -1,4 +1,4 @@
-# Vite React Project
+# Crypto Dashboard Project
 
 A modern React application powered by Vite, featuring fast refresh and optimized development experience.
 
