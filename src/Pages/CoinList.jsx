@@ -4,7 +4,8 @@ import Pagination from "../Components/Pagination";
 import Skeleton from "../Components/Skeleton";
 import { useNavigate } from "react-router-dom";
 import { useCoins } from "../api/apis";
-
+import { Tooltip } from "react-tooltip";
+import "./CoinList.css";
 function CoinList() {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, error } = useCoins(page, 20);
@@ -20,23 +21,6 @@ function CoinList() {
       setCoins(data);
     }
   }, [data]);
-  // useEffect(() => {
-  //   fetchCoins();
-  // }, [page]);
-
-  // async function fetchCoins() {
-  //   setLoading(true);
-  //   try {
-  //     const data = await fetchCoins(page);
-  //     setCoins(data);
-  //   } catch (error) {
-  //     console.error("Error fetching coins:", error);
-  //   } finally {
-  //     setTimeout(() => {
-  //       setLoading(false);
-  //     }, 500);
-  //   }
-  // }
 
   const getSortIcon = (key) => {
     if (sortConfig?.key !== key)
@@ -102,20 +86,20 @@ function CoinList() {
         <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden  divide-y divide-gray-200  ">
           <thead className="bg-gray-50 dark:bg-gray-700 ">
             <tr>
-              <th className="px-6 py-3 text-left  text-xs font-[700] text-gray-500 dark:text-gray-500 uppercase tracking-wider">
-                <span className="ml-[10px]"> Coin</span>
+              <th className="px-6 py-3 text-left text-xs font-[700] text-gray-500 dark:text-gray-500 uppercase tracking-wider">
+                <span className="ml-[10px]">Coin</span>
               </th>
               <th
                 onClick={() => handleSort("current_price")}
                 className="px-6 py-3 text-right text-xs font-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
               >
                 <span className="flex items-center justify-center">
-                  Price {getSortIcon("current_price")}{" "}
+                  Price {getSortIcon("current_price")}
                 </span>
               </th>
               <th
                 onClick={() => handleSort("price_change_percentage_24h")}
-                className="px-6 py-3 text-right text-xs ffont-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                className="px-6 py-3 text-right text-xs font-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
               >
                 <span className="flex items-center justify-center">
                   24h Change {getSortIcon("price_change_percentage_24h")}
@@ -167,6 +151,11 @@ function CoinList() {
                         ? "text-green-600"
                         : "text-red-600"
                     }`}
+                    data-tooltip-id="price-tooltip"
+                    data-tooltip-content={`Price change in the last 24 hours: ${coin.price_change_percentage_24h.toFixed(
+                      2
+                    )}%`}
+                    data-tooltip-place="top-start"
                   >
                     {coin.price_change_percentage_24h > 0 ? (
                       <ArrowUp size={16} />
@@ -177,7 +166,12 @@ function CoinList() {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
-                  ${coin.market_cap.toLocaleString()}
+                  <span
+                    data-tooltip-id="market-cap-tooltip"
+                    data-tooltip-content={`Market capitalization: $${coin.market_cap.toLocaleString()}`}
+                  >
+                    ${coin.market_cap.toLocaleString()}
+                  </span>
                 </td>
               </tr>
             ))}
@@ -185,6 +179,9 @@ function CoinList() {
         </table>
         <Pagination page={page} setPage={setPage} totalPages={10} />
       </div>
+
+      <Tooltip className="custom-tooltip" id="price-tooltip" />
+      {/* <Tooltip id="market-cap-tooltip" /> */}
     </div>
   );
 }

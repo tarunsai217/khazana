@@ -76,7 +76,6 @@ const fetchCoins = async (page = 1, perPage = 20) => {
 
 const fetchCoinDetails = async (id) => {
   await delay(50);
-
   const response = await api.get(`${BASE_URL}/coins/${id}`, {
     params: {
       localization: false,

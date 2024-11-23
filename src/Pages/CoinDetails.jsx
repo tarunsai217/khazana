@@ -136,7 +136,6 @@ const CoinDetail = () => {
               ))}
             </div>
           </div>
-          {console.log("priceHistory", priceHistory)}
           <div className="h-[400px] w-full">
             {chartLoading ? (
               <ChartSkeletonLoader />
