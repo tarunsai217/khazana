@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import {
   LineChart,
@@ -196,11 +196,9 @@ const CoinDetail = () => {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             About {displayCoinData?.name}
           </h2>
-          <div
-            className="prose max-w-none dark:prose-dark text-gray-900 dark:text-white"
-            dangerouslySetInnerHTML={{
-              __html: displayCoinData?.description.en,
-            }}
+          <ResponsiveDescription
+            content={displayCoinData?.description.en}
+            maxMobileChars={300}
           />
         </div>
       </div>
@@ -209,3 +207,71 @@ const CoinDetail = () => {
 };
 
 export default CoinDetail;
+
+export function ResponsiveDescription({ content, maxMobileChars = 300 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const { truncatedContent, needsTruncation } = useMemo(() => {
+    if (!content) return { truncatedContent: "", needsTruncation: false };
+
+    const stripped = content.replace(/<[^>]+>/g, "");
+    const needsTruncation = stripped.length > maxMobileChars;
+    const truncated = needsTruncation
+      ? stripped.substring(0, maxMobileChars).trim()
+      : stripped;
+
+    return {
+      truncatedContent: truncated,
+      needsTruncation,
+    };
+  }, [content, maxMobileChars]);
+
+  return (
+    <>
+      {/* Desktop View */}
+      <div
+        className="hidden md:block prose max-w-none dark:prose-dark text-gray-900 dark:text-white"
+        dangerouslySetInnerHTML={{
+          __html: content,
+        }}
+      />
+
+      {/* Mobile View */}
+      <div className="md:hidden">
+        <div className="text-gray-900 dark:text-white">
+          {isExpanded ? (
+            <>
+              <div
+                className="prose max-w-none dark:prose-dark"
+                dangerouslySetInnerHTML={{
+                  __html: content,
+                }}
+              />
+              <span
+                onClick={() => setIsExpanded(false)}
+                className="inline-block ml-1 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition-colors"
+              >
+                Show less
+              </span>
+            </>
+          ) : (
+            <p>
+              {truncatedContent}
+              {needsTruncation && (
+                <>
+                  ...{" "}
+                  <span
+                    onClick={() => setIsExpanded(true)}
+                    className="inline-block text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition-colors"
+                  >
+                    Read more
+                  </span>
+                </>
+              )}
+            </p>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}

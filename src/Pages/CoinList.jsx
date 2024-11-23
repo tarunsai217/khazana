@@ -70,7 +70,7 @@ function CoinList() {
   if (isLoading) return <Skeleton />;
 
   return (
-    <div className="w-full">
+    <div className="w-full px-4 sm:px-6 lg:px-8">
       <div className="mb-6">
         <div className="relative">
           <Search
@@ -86,25 +86,26 @@ function CoinList() {
           />
         </div>
       </div>
-      <div className="overflow-x-auto">
-        {error && (
-          <p className="mb-4 text-red-500">
-            {
-              "Looks like we hit the rate limit. Switching to mock data for now."
-            }
-          </p>
-        )}
-        <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden  divide-y divide-gray-200  ">
-          <thead className="bg-gray-50 dark:bg-gray-700 ">
+
+      {error && (
+        <p className="mb-4 text-red-500">
+          Looks like we hit the rate limit. Switching to mock data for now.
+        </p>
+      )}
+
+      {/* Desktop  View */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden divide-y divide-gray-200">
+          <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-[700] text-gray-500 dark:text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 <span className="ml-[10px]">Coin</span>
               </th>
               <th
                 onClick={() => handleSort("current_price")}
                 className="px-6 py-3 text-right text-xs font-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
               >
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-end">
                   Price {getSortIcon("current_price")}
                 </span>
               </th>
@@ -112,7 +113,7 @@ function CoinList() {
                 onClick={() => handleSort("price_change_percentage_24h")}
                 className="px-6 py-3 text-right text-xs font-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
               >
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-end">
                   24h Change {getSortIcon("price_change_percentage_24h")}
                 </span>
               </th>
@@ -120,19 +121,17 @@ function CoinList() {
                 onClick={() => handleSort("market_cap")}
                 className="px-6 py-3 text-right text-xs font-[700] text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
               >
-                <span className="flex items-center justify-center">
+                <span className="flex items-center justify-end">
                   Market Cap {getSortIcon("market_cap")}
                 </span>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-left">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {filteredCoins?.map((coin) => (
               <tr
                 key={coin.id}
-                onClick={() => {
-                  handleNavigateToCoinDetails(coin.id);
-                }}
+                onClick={() => handleNavigateToCoinDetails(coin.id)}
                 className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
               >
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -152,10 +151,10 @@ function CoinList() {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
                   ${coin.current_price.toLocaleString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                   <span
                     className={`inline-flex items-center ${
                       coin.price_change_percentage_24h > 0
@@ -166,7 +165,6 @@ function CoinList() {
                     data-tooltip-content={`Price change in the last 24 hours: ${coin.price_change_percentage_24h.toFixed(
                       2
                     )}%`}
-                    data-tooltip-place="top-start"
                   >
                     {coin.price_change_percentage_24h > 0 ? (
                       <ArrowUp size={16} />
@@ -176,23 +174,72 @@ function CoinList() {
                     {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
-                  <span
-                    data-tooltip-id="market-cap-tooltip"
-                    data-tooltip-content={`Market capitalization: $${coin.market_cap.toLocaleString()}`}
-                  >
-                    ${coin.market_cap.toLocaleString()}
-                  </span>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
+                  ${coin.market_cap.toLocaleString()}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <Pagination page={page} setPage={setPage} totalPages={10} />
       </div>
 
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {filteredCoins?.map((coin) => (
+          <div
+            key={coin.id}
+            onClick={() => handleNavigateToCoinDetails(coin.id)}
+            className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center">
+                <img
+                  src={coin.image}
+                  alt={coin.name}
+                  className="w-8 h-8 rounded-full"
+                />
+                <div className="ml-3">
+                  <div className="text-[1rem] font-[600] text-gray-900 dark:text-white">
+                    {coin.name}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {coin.symbol.toUpperCase()}
+                  </div>
+                </div>
+              </div>
+              <div
+                className={`flex items-center ${
+                  coin.price_change_percentage_24h > 0
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {coin.price_change_percentage_24h > 0 ? (
+                  <ArrowUp size={16} />
+                ) : (
+                  <ArrowDown size={16} />
+                )}
+                {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
+              </div>
+            </div>
+            <div className="flex justify-between mt-2 text-sm">
+              <div className="text-gray-500 dark:text-gray-400">Price</div>
+              <div className="font-medium text-gray-900 dark:text-white">
+                ${coin.current_price.toLocaleString()}
+              </div>
+            </div>
+            <div className="flex justify-between mt-1 text-sm">
+              <div className="text-gray-500 dark:text-gray-400">Market Cap</div>
+              <div className="font-medium text-gray-900 dark:text-white">
+                ${coin.market_cap.toLocaleString()}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Pagination page={page} setPage={setPage} totalPages={10} />
       <Tooltip className="custom-tooltip" id="price-tooltip" />
-      {/* <Tooltip id="market-cap-tooltip" /> */}
     </div>
   );
 }
