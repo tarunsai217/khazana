@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useCoins } from "../api/apis";
 import { Tooltip } from "react-tooltip";
 import { mockCoins } from "../api/mockData";
+import CoinImage from "../Components/CoinImage";
 import "./CoinList.css";
 function CoinList() {
   const [page, setPage] = useState(1);
@@ -136,7 +137,7 @@ function CoinList() {
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <img
+                    <CoinImage
                       src={coin.image}
                       alt={coin.name}
                       className="w-8 h-8 rounded-full"
@@ -193,7 +194,7 @@ function CoinList() {
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center">
-                <img
+                <CoinImage
                   src={coin.image}
                   alt={coin.name}
                   className="w-8 h-8 rounded-full"
