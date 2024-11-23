@@ -1,38 +1,42 @@
 import React, { useState, useEffect } from "react";
 import { ArrowDown, ArrowUp, Search, ArrowUpDown } from "lucide-react";
-import { getCoins } from "../api/apis";
 import Pagination from "../Components/Pagination";
 import Skeleton from "../Components/Skeleton";
 import { useNavigate } from "react-router-dom";
+import { useCoins } from "../api/apis";
 
 function CoinList() {
-  const [coins, setCoins] = useState([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, isError, error } = useCoins(page, 20);
+  const [coins, setCoins] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({
     key: null,
     direction: "desc",
   });
   const navigate = useNavigate();
-
   useEffect(() => {
-    fetchCoins();
-  }, [page]);
-
-  async function fetchCoins() {
-    setLoading(true);
-    try {
-      const data = await getCoins(page);
+    if (data) {
       setCoins(data);
-    } catch (error) {
-      console.error("Error fetching coins:", error);
-    } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
     }
-  }
+  }, [data]);
+  // useEffect(() => {
+  //   fetchCoins();
+  // }, [page]);
+
+  // async function fetchCoins() {
+  //   setLoading(true);
+  //   try {
+  //     const data = await fetchCoins(page);
+  //     setCoins(data);
+  //   } catch (error) {
+  //     console.error("Error fetching coins:", error);
+  //   } finally {
+  //     setTimeout(() => {
+  //       setLoading(false);
+  //     }, 500);
+  //   }
+  // }
 
   const getSortIcon = (key) => {
     if (sortConfig?.key !== key)
@@ -75,7 +79,7 @@ function CoinList() {
       coin.symbol.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <Skeleton />;
+  if (isLoading) return <Skeleton />;
 
   return (
     <div className="w-full">

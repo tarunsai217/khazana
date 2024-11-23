@@ -10,11 +10,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { RefreshCw, ArrowLeft } from "lucide-react";
-import { fetchCoinDetails, fetchCoinHistory } from "../api/apis";
-import { mockCoinDetails, mockPriceHistory } from "../api/mockData";
 import SkeletonLoader from "../Components/CoinDetailsSkeleton.jsx";
 import ChartSkeletonLoader from "../Components/ChartSkeleton";
 import { useNavigate } from "react-router-dom";
+import { useCoinDetails, useCoinHistory } from "../api/apis";
 
 const timeframes = [
   { label: "24h", value: 1 },
@@ -26,60 +25,22 @@ const timeframes = [
 
 const CoinDetail = () => {
   const { id } = useParams();
-  const [coinData, setCoinData] = useState(null);
-  const [priceHistory, setPriceHistory] = useState([]);
   const [timeframe, setTimeframe] = useState(timeframes[0]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [chartLoading, setChartLoading] = useState(false); // Add local loading state for the chart
   const navigate = useNavigate();
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [details] = await Promise.all([fetchCoinDetails(id)]);
-      setCoinData(details);
-      setError("");
-    } catch (err) {
-      console.error("Failed to fetch coin data:", err);
-      setError("Failed to load data. Using mock data instead.");
-      setCoinData(mockCoinDetails);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data: coinData,
+    isLoading: coinLoading,
+    error: coinError,
+    refetch: refetchCoinData,
+  } = useCoinDetails(id);
+  const {
+    data: priceHistory,
+    isLoading: chartLoading,
+    error: chartError,
+  } = useCoinHistory(id, timeframe.value);
 
-  const loadChartData = async () => {
-    try {
-      setChartLoading(true);
-      const history = await fetchCoinHistory(id, timeframe.value);
-      setPriceHistory(
-        history.map((point) => ({
-          timestamp: new Date(point[0]).toLocaleDateString(),
-          price: point[1],
-        }))
-      );
-      setError("");
-    } catch (err) {
-      console.error("Failed to fetch price history:", err);
-      setError("Failed to load data. Using mock data instead.");
-      setPriceHistory(mockPriceHistory);
-    } finally {
-      setTimeout(() => {
-        setChartLoading(false);
-      }, 200);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, [id]);
-
-  useEffect(() => {
-    loadChartData();
-  }, [timeframe]);
-
-  if (loading) {
+  if (coinLoading) {
     return <SkeletonLoader />;
   }
 
@@ -117,7 +78,7 @@ const CoinDetail = () => {
             </div>
           </div>
           <button
-            onClick={loadData}
+            onClick={refetchCoinData}
             className="p-2 bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors rounded-md flex items-center"
             title="Refresh data"
           >
@@ -125,7 +86,7 @@ const CoinDetail = () => {
           </button>
         </div>
 
-        {error && <p className="mt-4 text-red-500">{error}</p>}
+        {coinError && <p className="mt-4 text-red-500">{coinError}</p>}
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -156,7 +117,7 @@ const CoinDetail = () => {
 
         <div className="mt-8">
           <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 md:mb-0 text-left">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 md:mb-0 ">
               Price History
             </h2>
             <div className="flex space-x-2">
@@ -175,7 +136,7 @@ const CoinDetail = () => {
               ))}
             </div>
           </div>
-
+          {console.log("priceHistory", priceHistory)}
           <div className="h-[400px] w-full">
             {chartLoading ? (
               <ChartSkeletonLoader />
