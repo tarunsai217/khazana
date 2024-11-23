@@ -14,7 +14,7 @@ const Pagination = ({ page, setPage, totalPages }) => {
         {page > 1 && (
           <button
             onClick={() => setPage(page - 1)}
-            className="px-3 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-900"
+            className="px-3 py-1 rounded-lg hover:bg-gray-200 md:dark:hover:bg-gray-700 text-gray-900 dark:text-gray-900"
           >
             {page - 1}
           </button>
@@ -25,7 +25,7 @@ const Pagination = ({ page, setPage, totalPages }) => {
         {page < totalPages && (
           <button
             onClick={() => setPage(page + 1)}
-            className="px-3 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-900"
+            className="px-3 py-1 rounded-lg hover:bg-gray-200 md:dark:hover:bg-gray-700 text-gray-900 dark:text-gray-900"
           >
             {page + 1}
           </button>
