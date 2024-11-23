@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ImageOff } from "lucide-react";
-
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 function CoinImage({ src, alt, className = "w-8 h-8 rounded-full" }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [ref, isVisible] = useIntersectionObserver();
+
+  // Only set the image source when the component is visible
+  useEffect(() => {
+    if (isVisible && !imageSrc) {
+      setImageSrc(src);
+    }
+  }, [isVisible, src, imageSrc]);
 
   return (
-    <div className={`relative ${className}`}>
+    <div ref={ref} className={`relative ${className}`}>
       {/* Skeleton placeholder */}
       {isLoading && (
         <div
@@ -17,7 +26,7 @@ function CoinImage({ src, alt, className = "w-8 h-8 rounded-full" }) {
       {/* Actual image */}
       {!error ? (
         <img
-          src={src}
+          src={imageSrc}
           alt={alt}
           className={`${className} ${
             isLoading ? "opacity-0" : "opacity-100"
@@ -27,7 +36,6 @@ function CoinImage({ src, alt, className = "w-8 h-8 rounded-full" }) {
             setError(true);
             setIsLoading(false);
           }}
-          loading="lazy"
         />
       ) : (
         <div
