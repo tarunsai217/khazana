@@ -1,11 +1,14 @@
 import axios from "axios";
-const BASE_URL = "https://api.coingecko.com/api/v3";
 import { mockCoins } from "./mockData";
-console.log("mockCoins", mockCoins);
 
+const BASE_URL = "https://api.coingecko.com/api/v3";
+let apiKey = import.meta.env.VITE_API_KEY;
 const api = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
+  headers: {
+    "x-cg-demo-api-key": apiKey,
+  },
 });
 
 export const getCoins = async (page = 1, perPage = 20) => {
@@ -27,7 +30,7 @@ export const getCoins = async (page = 1, perPage = 20) => {
 };
 
 export const fetchCoinDetails = async (id) => {
-  const response = await axios.get(`${BASE_URL}/coins/${id}`, {
+  const response = await api.get(`${BASE_URL}/coins/${id}`, {
     params: {
       localization: false,
       tickers: false,
@@ -40,7 +43,7 @@ export const fetchCoinDetails = async (id) => {
 };
 
 export const fetchCoinHistory = async (id, days) => {
-  const response = await axios.get(`${BASE_URL}/coins/${id}/market_chart`, {
+  const response = await api.get(`${BASE_URL}/coins/${id}/market_chart`, {
     params: {
       vs_currency: "usd",
       days: days,
