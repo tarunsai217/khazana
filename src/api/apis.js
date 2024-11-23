@@ -75,28 +75,36 @@ const fetchCoins = async (page = 1, perPage = 20) => {
 };
 
 const fetchCoinDetails = async (id) => {
-  await delay(50);
-  const response = await api.get(`${BASE_URL}/coins/${id}`, {
-    params: {
-      localization: false,
-      tickers: false,
-      market_data: true,
-      community_data: false,
-      developer_data: false,
-    },
-  });
-  return response.data;
+  try {
+    await delay(50);
+    const response = await api.get(`${BASE_URL}/coins/${id}`, {
+      params: {
+        localization: false,
+        tickers: false,
+        market_data: true,
+        community_data: false,
+        developer_data: false,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    console.warn("CoinGecko API error:", err);
+  }
 };
 
 const fetchCoinHistory = async (id, days) => {
-  await delay(200);
-  const response = await api.get(`${BASE_URL}/coins/${id}/market_chart`, {
-    params: {
-      vs_currency: "usd",
-      days: days,
-    },
-  });
-  return response.data.prices;
+  try {
+    await delay(80);
+    const response = await api.get(`${BASE_URL}/coins/${id}/market_chart`, {
+      params: {
+        vs_currency: "usd",
+        days: days,
+      },
+    });
+    return response.data.prices;
+  } catch (err) {
+    console.warn("CoinGecko API error:", err);
+  }
 };
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

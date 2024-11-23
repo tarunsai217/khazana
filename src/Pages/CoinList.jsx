@@ -5,6 +5,7 @@ import Skeleton from "../Components/Skeleton";
 import { useNavigate } from "react-router-dom";
 import { useCoins } from "../api/apis";
 import { Tooltip } from "react-tooltip";
+import { mockCoins } from "../api/mockData";
 import "./CoinList.css";
 function CoinList() {
   const [page, setPage] = useState(1);
@@ -17,10 +18,13 @@ function CoinList() {
   });
   const navigate = useNavigate();
   useEffect(() => {
-    if (data) {
+    if (isError) {
+      console.error("Error fetching coins:", error);
+      setCoins(mockCoins);
+    } else if (data) {
       setCoins(data);
     }
-  }, [data]);
+  }, [data, isError, error]);
 
   const getSortIcon = (key) => {
     if (sortConfig?.key !== key)
@@ -83,6 +87,13 @@ function CoinList() {
         </div>
       </div>
       <div className="overflow-x-auto">
+        {error && (
+          <p className="mb-4 text-red-500">
+            {
+              "Looks like we hit the rate limit. Switching to mock data for now."
+            }
+          </p>
+        )}
         <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden  divide-y divide-gray-200  ">
           <thead className="bg-gray-50 dark:bg-gray-700 ">
             <tr>

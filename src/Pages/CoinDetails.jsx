@@ -12,8 +12,10 @@ import {
 import { RefreshCw, ArrowLeft } from "lucide-react";
 import SkeletonLoader from "../Components/CoinDetailsSkeleton.jsx";
 import ChartSkeletonLoader from "../Components/ChartSkeleton";
+import { ChartPlaceholder } from "../Components/ChartPlaceholder.jsx";
 import { useNavigate } from "react-router-dom";
 import { useCoinDetails, useCoinHistory } from "../api/apis";
+import { mockCoinDetails } from "../api/mockData.js";
 
 const timeframes = [
   { label: "24h", value: 1 },
@@ -27,35 +29,45 @@ const CoinDetail = () => {
   const { id } = useParams();
   const [timeframe, setTimeframe] = useState(timeframes[0]);
   const navigate = useNavigate();
+  const [isUsingMockData, setIsUsingMockData] = useState(false);
 
   const {
     data: coinData,
     isLoading: coinLoading,
+    isError: isCoinError,
     error: coinError,
     refetch: refetchCoinData,
   } = useCoinDetails(id);
   const {
     data: priceHistory,
     isLoading: chartLoading,
+    isError: isChartError,
     error: chartError,
   } = useCoinHistory(id, timeframe.value);
 
+  useEffect(() => {
+    if (isCoinError) {
+      setIsUsingMockData(true);
+    }
+  }, [isCoinError, coinError]);
   if (coinLoading) {
     return <SkeletonLoader />;
   }
 
-  if (!coinData) return null;
-
+  if (isCoinError) {
+    console.log("error", coinError);
+  }
   function goBackHandler() {
     navigate("/");
   }
+  let displayCoinData = isUsingMockData ? mockCoinDetails : coinData;
   return (
     <div className="space-y-8">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 md:p-6">
         <>
           <button
             onClick={goBackHandler}
-            className="mb-6 flex items-center text-blue-500 bg-transparent py-2 focus:outline-none "
+            className=" mb-2 md:mb-6 flex items-center text-blue-500 bg-transparent py-1 md:py-2 px-0 md:px-2 focus:outline-none "
           >
             <ArrowLeft size={20} className="mr-2" />
             Back
@@ -64,16 +76,16 @@ const CoinDetail = () => {
         <div className="flex justify-between items-start">
           <div className="flex items-center space-x-4">
             <img
-              src={coinData.image.large}
-              alt={coinData.name}
+              src={displayCoinData?.image.large}
+              alt={displayCoinData?.name}
               className="w-16 h-16"
             />
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {coinData.name}
+                {displayCoinData?.name}
               </h1>
               <p className="text-gray-500 dark:text-gray-400">
-                {coinData.symbol.toUpperCase()}
+                {displayCoinData?.symbol?.toUpperCase()}
               </p>
             </div>
           </div>
@@ -86,7 +98,13 @@ const CoinDetail = () => {
           </button>
         </div>
 
-        {coinError && <p className="mt-4 text-red-500">{coinError}</p>}
+        {coinError && (
+          <p className="mt-4 text-red-500">
+            {
+              "Looks like we hit the rate limit. Switching to mock data for now."
+            }
+          </p>
+        )}
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -94,7 +112,7 @@ const CoinDetail = () => {
               Market Cap Rank
             </p>
             <p className="text-xl font-semibold dark:text-white">
-              #{coinData.market_cap_rank}
+              #{displayCoinData?.market_cap_rank}
             </p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -102,7 +120,7 @@ const CoinDetail = () => {
               Current Price
             </p>
             <p className="text-xl font-semibold dark:text-white">
-              ${coinData.market_data.current_price.usd.toLocaleString()}
+              ${displayCoinData?.market_data.current_price.usd.toLocaleString()}
             </p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -110,7 +128,7 @@ const CoinDetail = () => {
               24h Trading Volume
             </p>
             <p className="text-xl font-semibold dark:text-white">
-              ${coinData.market_data.total_volume.usd.toLocaleString()}
+              ${displayCoinData?.market_data.total_volume.usd.toLocaleString()}
             </p>
           </div>
         </div>
@@ -139,6 +157,8 @@ const CoinDetail = () => {
           <div className="h-[400px] w-full">
             {chartLoading ? (
               <ChartSkeletonLoader />
+            ) : isChartError ? (
+              <ChartPlaceholder />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={priceHistory}>
@@ -174,11 +194,13 @@ const CoinDetail = () => {
 
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            About {coinData.name}
+            About {displayCoinData?.name}
           </h2>
           <div
             className="prose max-w-none dark:prose-dark text-gray-900 dark:text-white"
-            dangerouslySetInnerHTML={{ __html: coinData.description.en }}
+            dangerouslySetInnerHTML={{
+              __html: displayCoinData?.description.en,
+            }}
           />
         </div>
       </div>
